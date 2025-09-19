@@ -1,0 +1,169 @@
+/* Custom styles to complement Tailwind */
+
+/* Filter buttons */
+.filter-btn {
+    @apply px-4 py-2 text-sm font-medium text-gray-400 border border-slate-600 transition-all duration-200;
+}
+
+.filter-btn:hover {
+    @apply text-white border-slate-500;
+}
+
+.filter-btn.active {
+    @apply text-white bg-tactical-green border-tactical-green;
+}
+
+/* Product cards */
+.product-card {
+    @apply bg-slate-800 border border-slate-700 overflow-hidden transition-all duration-300 hover:border-slate-600 hover:shadow-xl hover:shadow-black/20;
+}
+
+.product-card:hover .product-image {
+    @apply scale-105;
+}
+
+.product-image {
+    @apply transition-transform duration-300;
+}
+
+/* Price styling */
+.price {
+    @apply text-lg font-bold text-tactical-green;
+}
+
+.price-original {
+    @apply text-sm text-gray-500 line-through;
+}
+
+/* Cart animations */
+.cart-item {
+    @apply border-b border-slate-700 last:border-b-0 py-4 transition-all duration-200;
+}
+
+.cart-item.removing {
+    @apply opacity-0 transform translate-x-full;
+}
+
+/* Custom scrollbar */
+#cart-items::-webkit-scrollbar {
+    width: 6px;
+}
+
+#cart-items::-webkit-scrollbar-track {
+    @apply bg-slate-700;
+}
+
+#cart-items::-webkit-scrollbar-thumb {
+    @apply bg-tactical-green rounded-full;
+}
+
+/* Button hover effects */
+.btn-primary {
+    @apply bg-tactical-green hover:bg-green-700 text-white font-semibold py-2 px-4 transition-all duration-200 border border-tactical-green hover:border-green-700;
+}
+
+.btn-secondary {
+    @apply bg-transparent hover:bg-slate-700 text-white font-semibold py-2 px-4 border border-slate-600 hover:border-slate-500 transition-all duration-200;
+}
+
+/* Size selector */
+.size-option {
+    @apply px-3 py-2 text-sm border border-slate-600 text-gray-400 hover:text-white hover:border-slate-500 transition-all duration-200 cursor-pointer;
+}
+
+.size-option.selected {
+    @apply text-white bg-tactical-green border-tactical-green;
+}
+
+.size-option.unavailable {
+    @apply opacity-50 cursor-not-allowed text-gray-600 hover:text-gray-600 hover:border-slate-600;
+}
+
+/* Quantity controls */
+.quantity-btn {
+    @apply w-8 h-8 flex items-center justify-center text-sm border border-slate-600 text-gray-400 hover:text-white hover:border-slate-500 transition-all duration-200;
+}
+
+.quantity-input {
+    @apply w-16 h-8 text-center bg-slate-700 border-t border-b border-slate-600 text-white text-sm;
+}
+
+/* Loading states */
+.loading-skeleton {
+    @apply animate-pulse bg-slate-700 rounded;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+    @apply fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50;
+}
+
+.modal-content {
+    @apply bg-slate-800 max-w-md w-full mx-4 border border-slate-700 shadow-2xl;
+}
+
+/* Product badges */
+.badge-new {
+    @apply absolute top-2 left-2 bg-tactical-green text-white text-xs font-semibold px-2 py-1 z-10;
+}
+
+.badge-sale {
+    @apply absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 z-10;
+}
+
+/* Mobile menu styles */
+@media (max-width: 768px) {
+    .mobile-menu {
+        @apply absolute top-16 left-0 right-0 bg-slate-900 border-b border-slate-700 shadow-xl;
+    }
+    
+    .mobile-menu a {
+        @apply block px-4 py-3 text-gray-300 hover:text-white hover:bg-slate-800 transition-colors;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Focus states for accessibility */
+button:focus,
+input:focus,
+select:focus {
+    @apply outline-none ring-2 ring-tactical-green ring-opacity-50;
+}
+
+/* Typography improvements */
+.tactical-caps {
+    @apply font-display tracking-wider uppercase;
+}
+
+/* Grid improvements */
+.products-grid-loading {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8;
+}
+
+.product-skeleton {
+    @apply space-y-4;
+}
+
+/* Cart sidebar improvements */
+.cart-open {
+    @apply transform translate-x-0;
+}
+
+.overlay-visible {
+    @apply opacity-100 visible;
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+    .hero-text {
+        @apply text-3xl;
+    }
+    
+    .cart-sidebar {
+        @apply w-full;
+    }
+}
