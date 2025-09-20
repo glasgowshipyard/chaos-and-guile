@@ -5,7 +5,7 @@ class TacticalStore {
         this.products = [];
         this.cart = this.loadCart();
         this.currentFilter = 'all';
-        this.apiBaseUrl = '/api'; // Will be handled by Cloudflare Workers
+        this.apiBaseUrl = 'https://chaos-guile-api.dev-a4b.workers.dev/api'; // Cloudflare Workers
         this.initializeStore();
     }
 
@@ -18,114 +18,20 @@ class TacticalStore {
     // Mock products for development - will be replaced with Printful API
     getMockProducts() {
         return [
-            {
-                id: 1,
-                name: "Dishonest Cat Tee",
-                description: "Premium tactical tee featuring our signature dishonest cat skull design.",
-                price: 28.00,
-                originalPrice: null,
-                category: "apparel",
-                images: ["dishonest-cat-blk-bg-example.png"],
-                sizes: ["S", "M", "L", "XL", "XXL"],
-                variants: [
-                    { id: 101, size: "S", price: 28.00, stock: 10 },
-                    { id: 102, size: "M", price: 28.00, stock: 15 },
-                    { id: 103, size: "L", price: 28.00, stock: 12 },
-                    { id: 104, size: "XL", price: 28.00, stock: 8 },
-                    { id: 105, size: "XXL", price: 30.00, stock: 5 }
-                ],
-                isNew: true,
-                printfulId: null // Will be populated with real Printful product IDs
-            },
-            {
-                id: 2,
-                name: "Chaos & Guile Hoodie",
-                description: "Heavy-duty hoodie for operators who work in the shadows.",
-                price: 58.00,
-                originalPrice: null,
-                category: "apparel",
-                images: ["https://via.placeholder.com/400x400/1a1f14/ffffff?text=Hoodie"],
-                sizes: ["S", "M", "L", "XL", "XXL"],
-                variants: [
-                    { id: 201, size: "S", price: 58.00, stock: 8 },
-                    { id: 202, size: "M", price: 58.00, stock: 12 },
-                    { id: 203, size: "L", price: 58.00, stock: 10 },
-                    { id: 204, size: "XL", price: 58.00, stock: 6 },
-                    { id: 205, size: "XXL", price: 62.00, stock: 4 }
-                ],
-                isNew: false
-            },
-            {
-                id: 3,
-                name: "SBS Tribute Patch",
-                description: "Velcro patch paying homage to strength and guile operations.",
-                price: 12.00,
-                originalPrice: null,
-                category: "patches",
-                images: ["https://via.placeholder.com/400x400/4a5d23/ffffff?text=Patch"],
-                sizes: ["One Size"],
-                variants: [
-                    { id: 301, size: "One Size", price: 12.00, stock: 25 }
-                ],
-                isNew: true
-            },
-            {
-                id: 4,
-                name: "Tactical Coffee Mug",
-                description: "Ceramic mug for proper mission fuel. Dishonest cats need caffeine too.",
-                price: 18.00,
-                originalPrice: 22.00,
-                category: "accessories",
-                images: ["https://via.placeholder.com/400x400/2d3748/ffffff?text=Mug"],
-                sizes: ["11oz", "15oz"],
-                variants: [
-                    { id: 401, size: "11oz", price: 18.00, stock: 15 },
-                    { id: 402, size: "15oz", price: 22.00, stock: 10 }
-                ],
-                isNew: false,
-                onSale: true
-            },
-            {
-                id: 5,
-                name: "Operator Beanie",
-                description: "Low-profile beanie for covert operations in cold climates.",
-                price: 24.00,
-                originalPrice: null,
-                category: "accessories",
-                images: ["https://via.placeholder.com/400x400/1a1f14/ffffff?text=Beanie"],
-                sizes: ["One Size"],
-                variants: [
-                    { id: 501, size: "One Size", price: 24.00, stock: 20 }
-                ],
-                isNew: false
-            },
-            {
-                id: 6,
-                name: "Stealth Sticker Pack",
-                description: "Collection of tactical stickers for gear marking and morale.",
-                price: 8.00,
-                originalPrice: null,
-                category: "accessories",
-                images: ["https://via.placeholder.com/400x400/4a5d23/ffffff?text=Stickers"],
-                sizes: ["Pack"],
-                variants: [
-                    { id: 601, size: "Pack", price: 8.00, stock: 50 }
-                ],
-                isNew: true
-            }
+            // Products will be loaded from Printful API
+            // This section intentionally left empty for real product integration
         ];
     }
 
     async loadProducts() {
         try {
-            // For now, use mock data. Later, this will call Printful API via Cloudflare Workers
-            // const response = await fetch(`${this.apiBaseUrl}/products`);
-            // this.products = await response.json();
-            
-            this.products = this.getMockProducts();
+            // Load products from Printful API via Cloudflare Workers
+            const response = await fetch(`${this.apiBaseUrl}/products`);
+            const data = await response.json();
+            this.products = data.products || [];
         } catch (error) {
             console.error('Failed to load products:', error);
-            this.products = this.getMockProducts(); // Fallback to mock data
+            this.products = []; // Empty array if API fails
         }
     }
 
@@ -483,7 +389,7 @@ class TacticalStore {
         this.updateCartUI();
     }
 
-    // Checkout functionality - will integrate with Printful API
+    // Checkout functionality with Stripe integration
     async checkout() {
         if (this.cart.length === 0) return;
 
@@ -491,26 +397,55 @@ class TacticalStore {
             // Show loading state
             const checkoutBtn = document.getElementById('checkout-btn');
             const originalText = checkoutBtn.textContent;
-            checkoutBtn.textContent = 'PROCESSING...';
+            checkoutBtn.textContent = 'REDIRECTING...';
             checkoutBtn.disabled = true;
 
-            // This will call Cloudflare Workers endpoint to create Printful order
+            // Prepare order data for Stripe
             const orderData = {
-                items: this.cart,
+                items: this.cart.map(item => ({
+                    productId: item.productId,
+                    variantId: item.variantId,
+                    name: item.name,
+                    size: item.size,
+                    price: item.price,
+                    quantity: item.quantity,
+                    image: item.image
+                })),
                 total: this.getCartTotal(),
-                // Customer info will be collected in checkout form
             };
 
-            // For now, simulate checkout
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Create Stripe checkout session
+            const response = await fetch(`${this.apiBaseUrl}/create-checkout-session`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create checkout session');
+            }
+
+            const { sessionId } = await response.json();
+
+            // Initialize Stripe and redirect to checkout
+            const stripe = Stripe('pk_live_51RPqbr08JDyCKj5sePt4dBQclBWFs0wy49MZiKvipZ1Tm4znUYgpwNZygLqDpoxFvPigGreOGB1M4HpIF1fj9qAE002OAp8TSO');
             
-            alert('Order simulation complete! Integration with Printful coming soon.');
-            this.clearCart();
+            const { error } = await stripe.redirectToCheckout({
+                sessionId: sessionId
+            });
+
+            if (error) {
+                throw new Error(error.message);
+            }
 
         } catch (error) {
             console.error('Checkout failed:', error);
-            alert('Checkout failed. Please try again.');
-        } finally {
+            alert('Checkout failed: ' + error.message);
+            
+            // Reset button state
             const checkoutBtn = document.getElementById('checkout-btn');
             checkoutBtn.textContent = 'SECURE CHECKOUT';
             checkoutBtn.disabled = false;

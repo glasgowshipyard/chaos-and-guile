@@ -9,6 +9,7 @@ function initializeApp() {
     setupScrollBehavior();
     setupMobileMenu();
     setupKeyboardNavigation();
+    setupThemeToggle();
     loadEnvironmentConfig();
 }
 
@@ -29,6 +30,28 @@ function setupProductFilters() {
     });
 }
 
+// Theme toggle functionality
+function setupThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // Check for saved theme preference or default to light mode
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    
+    if (currentTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+    
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            
+            // Save theme preference
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+    }
+}
+
 // Smooth scrolling and navigation
 function setupScrollBehavior() {
     // Smooth scroll to products
@@ -41,18 +64,15 @@ function setupScrollBehavior() {
             });
         }
     };
+}
 
-    // Header background on scroll
-    const header = document.querySelector('nav');
-    if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                header.classList.add('bg-slate-900');
-                header.classList.remove('bg-slate-900/95');
-            } else {
-                header.classList.add('bg-slate-900/95');
-                header.classList.remove('bg-slate-900');
-            }
+// Make sure scrollToProducts is globally available
+function scrollToProducts() {
+    const productsSection = document.getElementById('products');
+    if (productsSection) {
+        productsSection.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
         });
     }
 }

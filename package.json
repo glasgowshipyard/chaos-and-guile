@@ -1,0 +1,24 @@
+{
+  "name": "chaos-and-guile",
+  "version": "1.0.0",
+  "description": "*By Strength and Guile* - Professional subversion through premium tactical apparel.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glasgowshipyard/chaos-and-guile.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/glasgowshipyard/chaos-and-guile/issues"
+  },
+  "homepage": "https://github.com/glasgowshipyard/chaos-and-guile#readme",
+  "devDependencies": {
+    "tailwindcss": "^4.1.13"
+  }
+}

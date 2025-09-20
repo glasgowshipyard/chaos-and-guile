@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Success - Chaos & Guile</title>
+    <meta name="description" content="Your order has been successfully placed!">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-200">
+    <!-- Navigation -->
+    <nav class="bg-white/95 dark:bg-black/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex-shrink-0">
+                        <img src="dishonest-cat-blk-bg.png" alt="Logo" class="h-10 w-10 dark:invert">
+                    </div>
+                    <div class="text-xl font-mono font-semibold tracking-wider">
+                        CHAOS & GUILE
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Success Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div class="text-center">
+            <!-- Success Icon -->
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900 mb-8">
+                <svg class="h-8 w-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+
+            <h1 class="text-4xl font-bold font-mono tracking-wider mb-4">
+                ORDER CONFIRMED
+            </h1>
+            
+            <p class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+                Thank you for your purchase! Your order has been successfully placed and is being processed by our fulfillment team.
+            </p>
+
+            <!-- Order Processing Info -->
+            <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 max-w-2xl mx-auto mb-8">
+                <h2 class="text-lg font-semibold mb-4">What happens next?</h2>
+                <div class="space-y-4 text-left">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-black dark:bg-white rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-white dark:text-black text-sm font-bold">1</span>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">Order Processing</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">Your order is being prepared for printing (1-2 business days)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-black dark:bg-white rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-white dark:text-black text-sm font-bold">2</span>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">Production & Shipping</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">Your items are printed and shipped (3-7 business days)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0 w-6 h-6 bg-black dark:bg-white rounded-full flex items-center justify-center mt-0.5">
+                            <span class="text-white dark:text-black text-sm font-bold">3</span>
+                        </div>
+                        <div>
+                            <h3 class="font-medium">Delivery</h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">You'll receive tracking information via email</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-4 sm:space-y-0 sm:space-x-4 sm:flex sm:justify-center">
+                <a href="/" class="inline-block bg-black hover:bg-gray-800 dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black font-semibold py-3 px-8 rounded-lg transition-colors duration-200">
+                    CONTINUE SHOPPING
+                </a>
+            </div>
+
+            <!-- Order Status Note -->
+            <div class="mt-12 text-sm text-gray-500 dark:text-gray-400">
+                <p>Questions about your order? Contact us at support@chaosandguile.com</p>
+                <p class="mt-2">You will receive an email confirmation shortly with your order details and tracking information.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Process the successful order
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session_id');
+            
+            if (sessionId) {
+                try {
+                    // Clear the cart since order was successful
+                    localStorage.removeItem('chaosGuilCart');
+                    
+                    // Optionally notify the backend about successful payment
+                    const response = await fetch('https://chaos-guile-api.dev-a4b.workers.dev/api/payment-success', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ sessionId }),
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log('Order processed successfully:', result);
+                    }
+                } catch (error) {
+                    console.error('Error processing successful payment:', error);
+                    // Don't show error to user on success page
+                }
+            }
+        });
+    </script>
+</body>
+</html>

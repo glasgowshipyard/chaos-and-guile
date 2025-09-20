@@ -25,13 +25,15 @@ Chaos & Guile is a premium tactical apparel brand that serves as an elegant coun
 ### Backend (Cloudflare Workers)
 - **API Proxy**: Secure Printful API integration
 - **Order Processing**: Automated order creation and tracking
+- **Payment Processing**: Stripe Checkout integration
 - **Webhooks**: Real-time order status updates
 - **Security**: API key protection, CORS handling
 
-### E-commerce (Printful Integration)
+### E-commerce (Printful + Stripe Integration)
 - **Print-on-Demand**: No inventory management needed
 - **Product Sync**: Real-time product and pricing data
-- **Order Fulfillment**: Automatic order processing
+- **Payment Processing**: Secure Stripe Checkout sessions
+- **Order Fulfillment**: Automatic order processing after payment
 - **Shipping**: Global shipping via Printful network
 
 ## 🚀 Features
@@ -39,7 +41,8 @@ Chaos & Guile is a premium tactical apparel brand that serves as an elegant coun
 ### Store Features
 - **Product Catalog**: Clean grid with filtering by category
 - **Shopping Cart**: Sliding sidebar with quantity controls
-- **Checkout**: Secure order processing via Printful API
+- **Stripe Checkout**: Secure payment processing with automatic order creation
+- **Order Success**: Professional confirmation page with tracking info
 - **Responsive Design**: Perfect on all devices
 - **Real-time Updates**: Live inventory and pricing
 
@@ -55,14 +58,15 @@ Chaos & Guile is a premium tactical apparel brand that serves as an elegant coun
 ```
 chaos-and-guile/
 ├── index.html                  # Main storefront
+├── success.html               # Payment success page
 ├── css/
 │   └── styles.css             # Custom Tailwind extensions
 ├── js/
-│   ├── store.js               # Product and cart management
+│   ├── store.js               # Product and cart management with Stripe
 │   ├── cart.js                # Shopping cart UI
 │   └── main.js                # App initialization
 ├── workers/
-│   └── printful-api.js        # Cloudflare Worker for API proxy
+│   └── printful-api.js        # Cloudflare Worker for API proxy and Stripe
 ├── assets/
 │   └── images/                # Brand assets and product images
 ├── wrangler.toml              # Cloudflare Workers config
@@ -72,21 +76,23 @@ chaos-and-guile/
 ## 🎨 Design System
 
 ### Colors
-- **Primary**: Slate 900 (`#0f172a`) - Deep tactical background
-- **Accent**: Tactical Green (`#4a5d23`) - Military-inspired highlight
-- **Text**: White/Gray scale for maximum contrast
-- **Borders**: Subtle grays for clean separation
+- **Primary**: Black (`#000000`) - Clean, professional background
+- **Secondary**: White (`#ffffff`) - High contrast text and accents
+- **Gray Scale**: Various grays for subtle elements
+- **Hover States**: Smooth transitions between light/dark modes
 
 ### Typography
-- **Headers**: JetBrains Mono - Technical, tactical feel
-- **Body**: Inter - Clean, readable, professional
-- **Style**: ALL CAPS for emphasis, tracking for spacing
+- **Headers**: JetBrains Mono - Technical, professional feel
+- **Body**: Inter - Clean, readable, modern
+- **Style**: ALL CAPS for emphasis, letter spacing for elegance
+- **Source**: Bunny Fonts (privacy-friendly alternative to Google Fonts)
 
 ### Components
-- **Product Cards**: Hover effects, clean imagery
-- **Buttons**: Tactical green with smooth transitions
+- **Product Cards**: Hover effects, clean imagery, responsive grid
+- **Buttons**: Black/white theme with smooth transitions
 - **Cart**: Sliding sidebar with elegant animations
 - **Modals**: Dark overlay with focused content
+- **Success Page**: Professional order confirmation layout
 
 ## 🛠️ Development Setup
 
@@ -133,10 +139,12 @@ Set these in your Cloudflare Workers dashboard:
 # Production
 PRINTFUL_API_KEY=your_printful_api_key_here
 PRINTFUL_WEBHOOK_SECRET=your_webhook_secret_here
+STRIPE_SECRET_KEY=your_stripe_secret_key_here
 
 # Development  
 PRINTFUL_API_KEY=your_dev_api_key_here
 PRINTFUL_WEBHOOK_SECRET=your_dev_webhook_secret_here
+STRIPE_SECRET_KEY=your_dev_stripe_secret_key_here
 ```
 
 ### Printful Setup
@@ -145,11 +153,25 @@ PRINTFUL_WEBHOOK_SECRET=your_dev_webhook_secret_here
 3. Set up webhook endpoint pointing to your worker
 4. Configure products in Printful store
 
+### Stripe Setup
+1. Create Stripe account
+2. Get publishable and secret keys from dashboard
+3. Add secret key to Cloudflare Workers environment
+4. Update publishable key in store.js checkout function
+
 ### Cloudflare Setup
 1. Connect GitHub repo to Cloudflare Pages
 2. Set build command: *None* (static site)
 3. Set output directory: `/` (root)
 4. Deploy worker separately via Wrangler
+5. Set environment variables in Workers dashboard
+
+### Custom Domain Setup (chaosandguile.com)
+1. Add domain to Cloudflare
+2. Configure DNS to point to Cloudflare
+3. Set up Pages custom domain: chaosandguile.com → Pages project
+4. Configure Worker route: chaosandguile.com/api/* → Worker
+5. Update API base URL in js/store.js to use domain
 
 ## 📦 Product Management
 
@@ -174,11 +196,12 @@ For development, the store includes mock products:
 
 1. **Customer browses** products on storefront
 2. **Adds items** to cart with size/quantity selection
-3. **Proceeds to checkout** with shipping info
-4. **Order submitted** via Workers to Printful API
-5. **Printful processes** order and begins fulfillment
-6. **Customer receives** order confirmation and tracking
-7. **Webhooks update** order status in real-time
+3. **Proceeds to checkout** which creates Stripe checkout session
+4. **Customer pays** securely via Stripe Checkout
+5. **Payment success** triggers automatic Printful order creation
+6. **Printful processes** order and begins fulfillment
+7. **Customer receives** order confirmation and tracking
+8. **Webhooks update** order status in real-time
 
 ## 🚀 Deployment
 
@@ -201,7 +224,9 @@ wrangler deploy workers/printful-api.js
 
 ## 🔒 Security
 
-- **API Keys**: Stored securely in Cloudflare Workers
+- **API Keys**: Stored securely in Cloudflare Workers environment
+- **Payment Processing**: All payments handled by Stripe (PCI compliant)
+- **No Data Storage**: Zero user data retention for liability protection
 - **CORS**: Proper headers for cross-origin requests
 - **Webhooks**: Signature verification for Printful callbacks
 - **Input Validation**: All user inputs sanitized
@@ -220,19 +245,26 @@ wrangler deploy workers/printful-api.js
 - [ ] Product catalog loads correctly
 - [ ] Filtering works across all categories
 - [ ] Cart functionality (add/remove/update)
-- [ ] Checkout flow with Printful integration
+- [ ] Stripe checkout flow with test cards
+- [ ] Payment success page displays correctly
+- [ ] Printful order creation after payment
 - [ ] Responsive design on all screen sizes
 - [ ] Order confirmation and tracking
 
 ### API Testing
 ```bash
 # Test product endpoint
-curl https://your-worker.workers.dev/api/products
+curl https://chaos-and-guile-api.dev-a4b.workers.dev/api/products
 
-# Test order creation
-curl -X POST https://your-worker.workers.dev/api/order \
+# Test Stripe checkout session creation
+curl -X POST https://chaos-and-guile-api.dev-a4b.workers.dev/api/create-checkout-session \
   -H "Content-Type: application/json" \
-  -d '{"recipient":{"name":"Test"},"items":[...]}'
+  -d '{"items":[{"name":"Test Item","price":25.00,"quantity":1}],"total":25.00}'
+
+# Test payment success (use real session ID from Stripe)
+curl -X POST https://chaos-and-guile-api.dev-a4b.workers.dev/api/payment-success \
+  -H "Content-Type: application/json" \
+  -d '{"sessionId":"cs_test_..."}'
 ```
 
 ## 🔄 Future Enhancements
